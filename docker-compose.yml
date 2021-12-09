@@ -1,0 +1,48 @@
+version: "3"
+networks:
+  internal:
+    external: false
+services:
+  backend:
+    image: modicn/openjdk:8-bullseye
+    command: mvn exec:java -pl jeecg-boot-module-system -Dexec.mainClass="org.jeecg.JeecgSystemApplication"
+    networks:
+      - internal
+    volumes:
+      - ./_home:/home/pilot
+      - ./app:/app
+    working_dir: /app/jeecg-boot
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - LANG=C.UTF-8
+    networks:
+      - internal
+    volumes:
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./mysql/zz-zz.cnf:/etc/mysql/conf.d/zz-zz.cnf
+      - mysql_data:/var/lib/mysql
+  redis:
+    image: redis:6.2-alpine
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - internal
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_data:/data
+  frontend:
+    image: node:16-bullseye-slim
+    command: ["npm", "run", "serve"]
+    networks:
+      - internal
+    ulimits:
+      nofile:
+        soft: 102400
+        hard: 102400
+    volumes:
+      - ./app:/app
+    working_dir: /app/ant-design-vue-jeecg
+volumes:
+  mysql_data: ~
+  redis_data: ~

@@ -1,0 +1,5 @@
+CREATE DATABASE IF NOT EXISTS `app`;
+
+CREATE USER 'app'@'%' IDENTIFIED BY 'app';
+
+GRANT ALL ON `app`.* TO 'app'@'%';

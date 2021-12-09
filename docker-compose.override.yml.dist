@@ -1,0 +1,24 @@
+version: "3"
+networks:
+  traefik:
+    name: ${TRAEFIK_NETWORK}
+    external: true
+services:
+  backend:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+      - "traefik.http.routers.jeecg_backend.entrypoints=http"
+      - "traefik.http.routers.jeecg_backend.rule=Host(`jeecg-backend.example.com`)"
+      - "traefik.http.services.jeecg_backend.loadbalancer.server.port=8080"
+    networks:
+      - traefik
+  frontend:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+      - "traefik.http.routers.jeecg_frontend.entrypoints=http"
+      - "traefik.http.routers.jeecg_frontend.rule=Host(`jeecg-frontend.example.com`)"
+      - "traefik.http.services.jeecg_frontend.loadbalancer.server.port=3000"
+    networks:
+      - traefik
